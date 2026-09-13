@@ -322,16 +322,11 @@
       return !!(a && b && a.flight === b.flight && a.start === b.start);
     }
 
-    function localizeFlightTimes(flight) {
+    function localizeFlightTimes(flight, startOfToday, endOfWindow) {
       if (!flight || !flight.start || !flight.end) return flight;
       const start = new Date(flight.start);
       const end = new Date(flight.end);
       if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return flight;
-      const today = new Date();
-      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const twoMonthsLater = new Date(today);
-      twoMonthsLater.setDate(twoMonthsLater.getDate() + 60);
-      const endOfWindow = new Date(twoMonthsLater.getFullYear(), twoMonthsLater.getMonth(), twoMonthsLater.getDate(), 23, 59, 59, 999);
       const startDateKey = formatLocalDateKey(start);
 
       return {
@@ -544,10 +539,12 @@
         }
 
         const today = new Date();
+        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         const twoMonthsLater = new Date(today);
         twoMonthsLater.setDate(twoMonthsLater.getDate() + 60);
+        const endOfWindow = new Date(twoMonthsLater.getFullYear(), twoMonthsLater.getMonth(), twoMonthsLater.getDate(), 23, 59, 59, 999);
 
-        allFlights = (data.flights || []).map(localizeFlightTimes);
+        allFlights = (data.flights || []).map(flight => localizeFlightTimes(flight, startOfToday, endOfWindow));
         backendData = {
           ...data,
           flights: allFlights,
